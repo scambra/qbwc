@@ -2,49 +2,49 @@ module QBWC
   module Controller
     def self.included(base)
       base.class_eval do
-        include WashOut::SOAP
+        soap_service
         skip_before_filter :_parse_soap_parameters, :_authenticate_wsse, :_map_soap_parameters, :only => :qwc
         before_filter :get_session, :except => [:qwc, :authenticate, :_generate_wsdl]
         after_filter :save_session, :except => [:qwc, :authenticate, :_generate_wsdl, :close_connection, :connection_error]
 
         soap_action 'serverVersion', :to => :server_version,
                     :return => {'tns:serverVersionResult' => :string},
-                    :response_tag => 'tns:serverVersionResponse'
+                    :response_tag => 'serverVersionResponse'
 
         soap_action 'clientVersion', :to => :client_version,
                     :args   => {:strVersion => :string},
                     :return => {'tns:clientVersionResult' => :string},
-                    :response_tag => 'tns:clientVersionResponse'
+                    :response_tag => 'clientVersionResponse'
 
         soap_action 'authenticate',
                     :args   => {:strUserName => :string, :strPassword => :string},
                     :return => {'tns:authenticateResult' => StringArray},
-                    :response_tag => 'tns:authenticateResponse'
+                    :response_tag => 'authenticateResponse'
 
         soap_action 'sendRequestXML', :to => :send_request,
                     :args   => {:ticket => :string, :strHCPResponse => :string, :strCompanyFilename => :string, :qbXMLCountry => :string, :qbXMLMajorVers => :string, :qbXMLMinorVers => :string},
                     :return => {'tns:sendRequestXMLResult' => :string},
-                    :response_tag => 'tns:sendRequestXMLResponse'
+                    :response_tag => 'sendRequestXMLResponse'
 
         soap_action 'receiveResponseXML', :to => :receive_response,
                     :args   => {:ticket => :string, :response => :string, :hresult => :string, :message => :string},
                     :return => {'tns:receiveResponseXMLResult' => :integer},
-                    :response_tag => 'tns:receiveResponseXMLResponse'
+                    :response_tag => 'receiveResponseXMLResponse'
 
         soap_action 'closeConnection', :to => :close_connection,
                     :args   => {:ticket => :string},
                     :return => {'tns:closeConnectionResult' => :string},
-                    :response_tag => 'tns:closeConnectionResponse'
+                    :response_tag => 'closeConnectionResponse'
 
         soap_action 'connectionError', :to => :connection_error,
                     :args   => {:ticket => :string, :hresult => :string, :message => :string},
                     :return => {'tns:connectionErrorResult' => :string},
-                    :response_tag => 'tns:connectionErrorResponse'
+                    :response_tag => 'connectionErrorResponse'
 
         soap_action 'getLastError', :to => :get_last_error,
                     :args   => {:ticket => :string},
                     :return => {'tns:getLastErrorResult' => :string},
-                    :response_tag => 'tns:getLastErrorResponse'
+                    :response_tag => 'getLastErrorResponse'
       end
     end
 
