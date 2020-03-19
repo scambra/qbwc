@@ -1,6 +1,6 @@
 class QBWC::Session
 
-  attr_reader :user, :company, :ticket, :progress
+  attr_reader :user, :company, :ticket, :progress, :retry
   attr_accessor :error
 
   @@session = nil
@@ -53,12 +53,17 @@ class QBWC::Session
       response = response[response.keys.first]
       parse_response_header(response)
       self.current_job.process_response(response, self, iterator_id.blank? && !self.error)
-      self.next unless self.error || self.iterator_id.present? # search next request
+      self.next unless self.retry || self.error || self.iterator_id.present? # search next request
     rescue => e
       self.error = e.message
       Rails.logger.warn "An error occured in QBWC::Session: #{e.message}"
       Rails.logger.warn e.backtrace.join("\n")
     end
+  end
+
+  def retry
+    @retry = true
+    self.error = nil
   end
 
   def save
