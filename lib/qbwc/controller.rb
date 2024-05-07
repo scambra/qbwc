@@ -51,14 +51,14 @@ module QBWC
     def qwc
       qwc = <<QWC
 <QBWCXML>
-   <AppName>#{Rails.application.class.parent_name} #{Rails.env} #{@app_name_suffix}</AppName>
+   <AppName>#{app_name}</AppName>
    <AppID></AppID>
    <AppURL>#{url_for(:controller => self.controller_path, :action => 'action', :protocol => 'https://')}</AppURL>
    <AppDescription>Quickbooks integration</AppDescription>
    <AppSupport>#{QBWC.support_site_url || root_url(:protocol => 'https://')}</AppSupport>
    <UserName>#{@username || QBWC.username}</UserName>
    <OwnerID>#{@owner_id || QBWC.owner_id}</OwnerID>
-   <FileID>{90A44FB5-33D9-4815-AC85-BC87A7E7D1EB}</FileID>
+   <FileID>{#{file_id}}</FileID>
    <QBType>QBFS</QBType>
    <Style>Document</Style>
    <Scheduler>
@@ -66,7 +66,7 @@ module QBWC
    </Scheduler>
 </QBWCXML>
 QWC
-      send_data qwc, :filename => "#{@filename || Rails.application.class.parent_name}.qwc", :content_type => 'application/x-qwc'
+      send_data qwc, :filename => "#{@filename || Rails.application.class.try(:module_parent_name) || Rails.application.class.parent_name}.qwc", :content_type => 'application/x-qwc'
     end
 
     class StringArray < WashOut::Type
@@ -119,6 +119,14 @@ QWC
 
     def get_last_error
       render :soap => {'tns:getLastErrorResult' => @session.error || ''}
+    end
+
+    def app_name
+      "#{Rails.application.class.try(:module_parent_name) || Rails.application.class.parent_name} #{Rails.env} #{@app_name_suffix}"
+    end
+
+    def file_id
+      '90A44FB5-33D9-4815-AC85-BC87A7E7D1EB'
     end
 
     protected

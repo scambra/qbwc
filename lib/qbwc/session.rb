@@ -17,7 +17,7 @@ class QBWC::Session
     @progress = 0
     @iterator_id = nil
 
-    @ticket = ticket || Digest::SHA1.hexdigest("#{Rails.application.config.secret_token}#{Time.now.to_i}")
+    @ticket = ticket || Digest::SHA1.hexdigest("#{Rails.application.config.try(:secret_key_base) || Rails.application.config.try(:secret_token)}#{Time.now.to_i}")
 
     @@session = self
     reset(ticket.nil?)
